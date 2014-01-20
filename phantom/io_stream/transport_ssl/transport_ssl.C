@@ -36,6 +36,7 @@ public:
 		config::objptr_t<auth_t> auth;
 		string_t ciphers;
 		interval_t timeout;
+		int ssl_version;
 
 		inline config_t() throw() : auth(), ciphers(), timeout(interval_second) { }
 		inline ~config_t() throw() { }
@@ -47,7 +48,7 @@ public:
 	};
 
 	inline transport_ssl_t(string_t const &, config_t const &config) throw() :
-		ctx(ssl_ctx_t::server, config.auth, config.ciphers),
+		ctx(ssl_ctx_t::version_t(config.ssl_version), ssl_ctx_t::server, config.auth, config.ciphers),
 		timeout(config.timeout) { }
 
 	inline ~transport_ssl_t() throw() { }

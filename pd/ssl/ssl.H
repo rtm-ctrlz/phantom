@@ -31,8 +31,9 @@ class ssl_ctx_t {
 public:
 	void *internal;
 	enum mode_t { client, server };
+	enum version_t { SSL_V1 = 1, SSL_V2 = 2, SSL_V3 = 3 };
 
-	ssl_ctx_t(mode_t _mode, ssl_auth_t const *auth, string_t const &ciphers);
+	ssl_ctx_t(version_t version, mode_t _mode, ssl_auth_t const *auth, string_t const &ciphers);
 
 	~ssl_ctx_t() throw();
 

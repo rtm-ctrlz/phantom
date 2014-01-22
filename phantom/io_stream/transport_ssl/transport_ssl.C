@@ -11,6 +11,7 @@
 #include <pd/ssl/bq_conn_ssl.H>
 
 #include <pd/base/config.H>
+#include <pd/base/config_enum.H>
 #include <pd/base/fd.H>
 #include <pd/base/exception.H>
 
@@ -36,9 +37,9 @@ public:
 		config::objptr_t<auth_t> auth;
 		string_t ciphers;
 		interval_t timeout;
-		int ssl_version;
+		config::enum_t<ssl_ctx_t::ssl_version_t> ssl_version;
 
-		inline config_t() throw() : auth(), ciphers(), timeout(interval_second) { }
+		inline config_t() throw() : auth(), ciphers(), timeout(interval_second), ssl_version(ssl_ctx_t::SSLv23) { }
 		inline ~config_t() throw() { }
 
 		inline void check(in_t::ptr_t const &ptr) const {
@@ -48,7 +49,7 @@ public:
 	};
 
 	inline transport_ssl_t(string_t const &, config_t const &config) throw() :
-		ctx(ssl_ctx_t::version_t(config.ssl_version), ssl_ctx_t::server, config.auth, config.ciphers),
+		ctx(ssl_ctx_t::server, config.ssl_version, config.auth, config.ciphers),
 		timeout(config.timeout) { }
 
 	inline ~transport_ssl_t() throw() { }
@@ -60,8 +61,16 @@ config_binding_type(transport_ssl_t, auth_t);
 config_binding_value(transport_ssl_t, auth);
 config_binding_value(transport_ssl_t, ciphers);
 config_binding_value(transport_ssl_t, timeout);
+config_binding_value(transport_ssl_t, ssl_version);
 config_binding_ctor(transport_t, transport_ssl_t);
 }
+
+config_enum_internal_sname(ssl_ctx_t, ssl_version_t);
+config_enum_internal_value(ssl_ctx_t, ssl_version_t, SSLv23);
+config_enum_internal_value(ssl_ctx_t, ssl_version_t, SSLv2);
+config_enum_internal_value(ssl_ctx_t, ssl_version_t, SSLv3);
+config_enum_internal_value(ssl_ctx_t, ssl_version_t, TLSv1);
+config_enum_internal_value(ssl_ctx_t, ssl_version_t, TLSv1_1);
 
 bq_conn_t *transport_ssl_t::new_connect(
 	int fd, fd_ctl_t const *_ctl, log::level_t remote_errors

@@ -117,23 +117,28 @@ ssl_auth_t::ssl_auth_t(
 ssl_auth_t::~ssl_auth_t() throw() { }
 
 ssl_ctx_t::ssl_ctx_t(
-	version_t version, mode_t _mode, ssl_auth_t const *auth, string_t const &ciphers
+	mode_t _mode, ssl_version_t version, ssl_auth_t const *auth, string_t const &ciphers
 ) : internal(NULL) {
 
 	SSL_CTX *ctx;
 	switch(version)
 	{
-		case SSL_V1:
+		case TLSv1:
 			ctx = SSL_CTX_new(
 					_mode == client ? TLSv1_client_method() : TLSv1_server_method()
 					);
 			break;
-		case SSL_V2:
+		case TLSv1_1:
+			ctx = SSL_CTX_new(
+					_mode == client ? TLSv1_1_client_method() : TLSv1_1_server_method()
+					);
+			break;
+		case SSLv2:
 			ctx = SSL_CTX_new(
 					_mode == client ? SSLv2_client_method() : SSLv2_server_method()
 					);
 			break;
-		case SSL_V3:
+		case SSLv3:
 			ctx = SSL_CTX_new(
 					_mode == client ? SSLv3_client_method() : SSLv3_server_method()
 					);
